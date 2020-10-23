@@ -1,0 +1,53 @@
+pipeline {
+    agent none
+
+    triggers {
+        pollSCM '* * * * *'
+    }
+    stages {
+        stage('Build & Test') {
+            agent {
+                docker {
+                    image 'gradle:jdk11'
+                    args '-v "$PWD":/home/gradle/project -w /home/gradle/project'
+                }
+            }
+            steps {
+                echo 'Start building'
+                sh 'chmod 777 ./gradlew'
+                sh './gradlew assemble'
+                sh './gradlew test'
+            }
+        }
+        stage('Build Docker image') {
+            agent any
+            steps {
+                sh 'chmod 777 ./gradlew'
+                sh './gradlew docker'
+            }
+        }
+        stage('Push Docker image') {
+            agent any
+            environment {
+                DOCKER_HUB_LOGIN = credentials('docker-hub')
+            }
+            steps {
+                sh 'chmod 777 ./gradlew'
+                sh 'docker login --username=$DOCKER_HUB_LOGIN_USR --password=$DOCKER_HUB_LOGIN_PSW'
+                sh './gradlew dockerPush'
+            }
+        }
+        stage('Deploy to AWS') {
+            agent any
+            environment {
+                DOCKER_HUB_LOGIN = credentials('docker-hub')
+            }
+            steps {
+                sh 'chmod 777 ./gradlew'
+                withAWS(credentials: 'aws-credentials', region: env.AWS_REGION) {
+                    sh './gradlew awsCfnMigrateStack awsCfnWaitStackComplete -PsubnetId=$FACUS_API_SUBNET_ID -PdockerHubUsername=$DOCKER_HUB_LOGIN_USR -Pregion=$AWS_REGION'
+                }
+            }
+        }
+    }
+}
