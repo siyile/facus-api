@@ -53,3 +53,8 @@ Resources:
             - !Ref SubnetID
           SecurityGroups:
             - !GetAtt ServiceSecurityGroup.GroupId
+      ServiceRegistries:
+        - ContainerName: !Sub ${ServiceName}-container
+          ContainerPort: 8080
+          Port: 8080
+          RegistryArn: arn:aws:servicediscovery:us-west-2:964584109262:service/srv-ng2n3q5becrbzmik
