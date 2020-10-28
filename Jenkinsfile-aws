@@ -49,5 +49,16 @@ pipeline {
                 }
             }
         }
+        stage('Force update ecs service') {
+            agent {
+                docker {
+                    image 'amazon/aws-cli'
+                    args '-v ~/.aws:/root/.aws'
+                }
+            }
+            steps {
+                sh 'aws ecs update-service --cluster facus-api-cluster --service facus-api-service --force-new-deployment'
+            }
+        }
     }
 }
