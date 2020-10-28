@@ -26,39 +26,30 @@ pipeline {
                 sh './gradlew docker'
             }
         }
-        stage('Push Docker image') {
-            agent any
-            environment {
-                DOCKER_HUB_LOGIN = credentials('docker-hub')
-            }
-            steps {
-                sh 'chmod 777 ./gradlew'
-                sh 'docker login --username=$DOCKER_HUB_LOGIN_USR --password=$DOCKER_HUB_LOGIN_PSW'
-                sh './gradlew dockerPush'
-            }
-        }
-        stage('Deploy to AWS') {
-            agent any
-            environment {
-                DOCKER_HUB_LOGIN = credentials('docker-hub')
-            }
-            steps {
-                sh 'chmod 777 ./gradlew'
-                withAWS(credentials: 'aws-credentials', region: env.AWS_REGION) {
-                    sh './gradlew awsCfnMigrateStack awsCfnWaitStackComplete -PsubnetId=$FACUS_API_SUBNET_ID -PdockerHubUsername=$DOCKER_HUB_LOGIN_USR -Pregion=$AWS_REGION'
+        /*
+            stage('Push Docker image') {
+                agent any
+                environment {
+                    DOCKER_HUB_LOGIN = credentials('docker-hub')
+                }
+                steps {
+                    sh 'chmod 777 ./gradlew'
+                    sh 'docker login --username=$DOCKER_HUB_LOGIN_USR --password=$DOCKER_HUB_LOGIN_PSW'
+                    sh './gradlew dockerPush'
                 }
             }
-        }
-        stage('Force update ecs service') {
-            agent {
-                docker {
-                    image 'amazon/aws-cli'
-                    args '-v ~/.aws:/root/.aws'
+            stage('Deploy to AWS') {
+                agent any
+                environment {
+                    DOCKER_HUB_LOGIN = credentials('docker-hub')
+                }
+                steps {
+                    sh 'chmod 777 ./gradlew'
+                    withAWS(credentials: 'aws-credentials', region: env.AWS_REGION) {
+                        sh './gradlew awsCfnMigrateStack awsCfnWaitStackComplete -PsubnetId=$FACUS_API_SUBNET_ID -PdockerHubUsername=$DOCKER_HUB_LOGIN_USR -Pregion=$AWS_REGION'
+                    }
                 }
             }
-            steps {
-                sh 'aws ecs update-service --cluster facus-api-cluster --service facus-api-service --force-new-deployment'
-            }
-        }
+        */
     }
 }
