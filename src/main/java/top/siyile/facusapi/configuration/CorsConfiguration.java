@@ -1,4 +1,4 @@
-package top.siyile.facusapi;
+package top.siyile.facusapi.configuration;
 
 import org.springframework.boot.web.servlet.FilterRegistrationBean;
 import org.springframework.context.annotation.Bean;
