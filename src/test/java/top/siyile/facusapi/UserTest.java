@@ -5,16 +5,19 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.TestPropertySource;
+import top.siyile.facusapi.controller.UserController;
+import top.siyile.facusapi.model.User;
+import top.siyile.facusapi.repository.UserRepository;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
 @SpringBootTest
 @TestPropertySource(properties = { "spring.config.location=classpath:application.yml" })
 @Slf4j
-public class EntryTest {
-    private final EntryController controller;
+public class UserTest {
+    private final UserController controller;
     @Autowired
-    public EntryTest(EntryController controller) {
+    public UserTest(UserController controller) {
         this.controller = controller;
     }
 
@@ -24,10 +27,7 @@ public class EntryTest {
     }
 
     @Test
-    public void counter(@Autowired EntryRepository repository) {
-        repository.save(new Entry("Dream", "MeowMeow"));
-        repository.findAll().forEach(entry -> log.info(entry.toString()));
-        assertThat(controller.counter()).extracting("number").isEqualTo(3);
-        assertThat(controller.counter().getResults()).contains("Meow: 2", "MeowMeow: 1");
+    public void counter(@Autowired UserRepository repository) {
+        repository.save(new User("user", "password"));
     }
 }
