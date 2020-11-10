@@ -6,10 +6,11 @@ import lombok.Setter;
 @Getter
 @Setter
 public class UserForm {
+    private String email;
+    private String password;
+
     private String firstName;
     private String lastName;
-    private String country;
-    private String timeZone;
     private String subject;
     private String studyYear;
 }

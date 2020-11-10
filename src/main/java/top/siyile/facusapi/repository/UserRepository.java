@@ -7,6 +7,6 @@ import top.siyile.facusapi.model.User;
 @RepositoryRestResource
 public interface UserRepository extends MongoRepository<User, String>{
 
-    public User findByUserName(String userName);
+    public User findByEmail(String email);
 
 }
