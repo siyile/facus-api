@@ -22,61 +22,55 @@ public class UserController {
     private PasswordEncoder passwordEncoder;
 
     @PostMapping("/login")
-    public ResponseEntity<String> userLogin(@RequestParam("userName") String userName,
-                                            @RequestParam("password") String password,
-                                            HttpSession session) {
-        User foundUser = repository.findByUserName(userName);
+    public ResponseEntity<?> userLogin(@RequestParam("email") String email,
+                                       @RequestParam("password") String password,
+                                       HttpSession session) {
+        User foundUser = repository.findByEmail(email);
         if(foundUser != null) {
             if(passwordEncoder.matches(password, foundUser.password)) {
-                session.setAttribute("username", userName);
+                session.setAttribute("email", email);
             } else {
                 return ResponseEntity.badRequest().body("Incorrect password");
             }
         } else {
-            return ResponseEntity.badRequest().body("Incorrect user name");
+            return ResponseEntity.badRequest().body("Incorrect email");
         }
-        return ResponseEntity.ok("Login succeeds");
+        return ResponseEntity.ok(foundUser.userWithoutPassword());
     }
 
     @PostMapping("/register")
-    public ResponseEntity<String> userRegister(@RequestParam("userName") String userName,
-                                               @RequestParam("password") String password,
-                                               @RequestParam("passwordConfirmation") String passwordConfirmation,
-                                               HttpSession session) {
-        if(!password.equals(passwordConfirmation)) {
-            return ResponseEntity.badRequest().body("Password confirmation isn't correct");
-        }
-
-        User foundUser = repository.findByUserName(userName);
+    public ResponseEntity<?> userRegister(@RequestBody UserForm userForm,
+                                          HttpSession session) {
+        User foundUser = repository.findByEmail(userForm.getEmail());
+        User newUser;
         if(foundUser != null) {
-            return ResponseEntity.badRequest().body("User name already exists");
+            return ResponseEntity.badRequest().body("Email already exists");
         } else {
-            User newUser = new User(userName, passwordEncoder.encode(password));
+            newUser = new User(userForm.getEmail(), passwordEncoder.encode(userForm.getPassword()));
+            newUser.setValueFromForm(userForm);
             repository.save(newUser);
-            session.setAttribute("username", userName);
+            session.setAttribute("email", userForm.getEmail());
         }
-        return ResponseEntity.ok("Register succeeds");
+        return ResponseEntity.ok(newUser.userWithoutPassword());
     }
 
     @GetMapping("/logout")
     public ResponseEntity<String> logout(HttpSession session)
     {
-        session.removeAttribute("username");
+        session.removeAttribute("email");
         session.invalidate();
         return ResponseEntity.ok("Logout succeeds");
     }
 
     @GetMapping("/user")
-    public ResponseEntity<UserForm> getUserForm(HttpSession session) {
+    public ResponseEntity<?> getUserForm(HttpSession session) {
         User loggedUser = getUserFromSession(session);
         if(loggedUser == null) {
-            return ResponseEntity.badRequest().body(null);
+            return ResponseEntity.badRequest().body("User not logged in yet");
         } else {
             UserForm loggedUserForm = new UserForm();
             loggedUserForm.setFirstName(loggedUser.firstName);
             loggedUserForm.setLastName(loggedUser.lastName);
-            loggedUserForm.setCountry(loggedUser.country);
-            loggedUserForm.setTimeZone(loggedUser.timeZone);
             loggedUserForm.setSubject(loggedUser.subject);
             loggedUserForm.setStudyYear(loggedUser.studyYear);
 
@@ -93,23 +87,11 @@ public class UserController {
         } else {
             loggedUser.firstName = userForm.getFirstName();
             loggedUser.lastName = userForm.getLastName();
-            loggedUser.country = userForm.getCountry();
-            loggedUser.timeZone = userForm.getTimeZone();
             loggedUser.subject = userForm.getSubject();
             loggedUser.studyYear = userForm.getStudyYear();
             repository.save(loggedUser);
         }
         return ResponseEntity.ok("Update user info succeeds");
-    }
-
-    @GetMapping("/goal")
-    public ResponseEntity<String> getGoal(HttpSession session) {
-        User loggedUser = getUserFromSession(session);
-        if(loggedUser == null) {
-            return ResponseEntity.badRequest().body("Not logged in yet");
-        } else {
-            return ResponseEntity.ok(loggedUser.goal);
-        }
     }
 
     @PostMapping("/matching")
@@ -119,18 +101,17 @@ public class UserController {
         if(loggedUser == null) {
             return ResponseEntity.badRequest().body("Not logged in yet");
         } else {
-            loggedUser.goal = goal;
             repository.save(loggedUser);
             return ResponseEntity.ok(DEMO_URL);
         }
     }
 
     public User getUserFromSession(HttpSession session) {
-        String loggedUserName = (String) session.getAttribute("username");
-        if(loggedUserName == null) {
+        String loggedUserEmail = (String) session.getAttribute("email");
+        if(loggedUserEmail == null) {
             return null;
         } else {
-            return repository.findByUserName(loggedUserName);
+            return repository.findByEmail(loggedUserEmail);
         }
     }
 }
