@@ -22,15 +22,23 @@ import org.springframework.data.annotation.Id;
     public User(String email, String password) {
         this.email = email;
         this.password = password;
+        this.subject = "Computer Science";
+        this.studyYear = "Junior";
+        this.country = "United States";
     }
 
     public void setValueFromForm(UserForm userForm) {
         this.firstName = userForm.getFirstName();
         this.lastName = userForm.getLastName();
-        this.subject = userForm.getSubject();
-        this.studyYear = userForm.getStudyYear();
-        this.studyYear = userForm.getStudyYear();
-        this.country = userForm.getCountry();
+        if (!userForm.getSubject().isBlank()) {
+            this.subject = userForm.getSubject();
+        }
+        if (!userForm.getStudyYear().isBlank()) {
+            this.studyYear = userForm.getStudyYear();
+        }
+        if (!userForm.getCountry().isBlank()) {
+            this.country = userForm.getCountry();
+        }
     }
 
     public User userWithoutPassword() {
