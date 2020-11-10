@@ -13,4 +13,5 @@ public class UserForm {
     private String lastName;
     private String subject;
     private String studyYear;
+    public String country;
 }
