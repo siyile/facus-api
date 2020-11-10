@@ -13,7 +13,7 @@ import javax.servlet.http.HttpSession;
 @RestController
 public class UserController {
 
-    private static final String DEMO_URL = "";
+    private static final String DEMO_URL = "https://facus.us/zr9yr2g5jr";
 
     @Autowired
     private UserRepository repository;
@@ -73,7 +73,7 @@ public class UserController {
     }
 
     @PostMapping("/user")
-    public ResponseEntity<String> updateUser(@RequestBody UserForm userForm,
+    public ResponseEntity<?> updateUser(@RequestBody UserForm userForm,
                                              HttpSession session) {
         User loggedUser = getUserFromSession(session);
         if(loggedUser == null) {
@@ -82,7 +82,7 @@ public class UserController {
             loggedUser.setValueFromForm(userForm);
             repository.save(loggedUser);
         }
-        return ResponseEntity.ok("Update user info succeeds");
+        return ResponseEntity.ok(loggedUser.userWithoutPassword());
     }
 
     @PostMapping("/matching")
