@@ -4,6 +4,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
+import top.siyile.facusapi.model.LoginForm;
 import top.siyile.facusapi.model.User;
 import top.siyile.facusapi.model.UserForm;
 import top.siyile.facusapi.repository.UserRepository;
@@ -22,9 +23,10 @@ public class UserController {
     private PasswordEncoder passwordEncoder;
 
     @PostMapping("/login")
-    public ResponseEntity<?> userLogin(@RequestParam("email") String email,
-                                       @RequestParam("password") String password,
+    public ResponseEntity<?> userLogin(@RequestBody LoginForm loginForm,
                                        HttpSession session) {
+        String email = loginForm.getEmail();
+        String password = loginForm.getPassword();
         User foundUser = repository.findByEmail(email);
         if(foundUser != null) {
             if(passwordEncoder.matches(password, foundUser.password)) {
