@@ -88,7 +88,7 @@ public class UserController {
     }
 
     @PostMapping("/matching")
-    public ResponseEntity<String> matching(@RequestParam("goal") String goal,
+    public ResponseEntity<String> matching(@RequestBody String goal,
                                           HttpSession session) {
         User loggedUser = getUserFromSession(session);
         if(loggedUser == null) {
