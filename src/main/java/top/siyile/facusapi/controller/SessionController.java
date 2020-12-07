@@ -31,6 +31,15 @@ public class SessionController {
         return ResponseEntity.ok(allSessions);
     }
 
+    @GetMapping("/session/{sid}")
+    public ResponseEntity<?> getSessionBySid(@PathVariable("sid") String sid) {
+        Optional<Session> session = repository.findById(sid);
+        if(session.isEmpty()) {
+            return ResponseEntity.badRequest().body("session not found");
+        }
+        return ResponseEntity.ok(session.get());
+    }
+
     @PostMapping("/session")
     public ResponseEntity<?> updateSession(@RequestBody SessionForm sessionForm) {
         String operation = sessionForm.getOperation();
