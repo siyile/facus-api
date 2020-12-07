@@ -8,16 +8,14 @@ import top.siyile.facusapi.repository.SessionRepository;
 import top.siyile.facusapi.repository.UserRepository;
 
 import javax.servlet.http.HttpSession;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 
 
 @RestController
 public class SessionController {
 
     private static final List<String> ALL_STATUS = Arrays.asList("created", "matched", "started", "expired", "cancelled");
+    private static final String CANDIDATE_CHARS = "abcdefghijklmnopqrstuvwxyz0123456789";
 
     @Autowired
     private SessionRepository repository;
@@ -155,17 +153,25 @@ public class SessionController {
                 repository.save(newSession);
                 return ResponseEntity.ok(newSession);
             } else {
+                // generate a randomized url for the new session
+                StringBuilder sb = new StringBuilder();
+                Random random = new Random();
+                for (int i = 0; i < 12; i++) {
+                    sb.append(CANDIDATE_CHARS.charAt(random.nextInt(CANDIDATE_CHARS
+                            .length())));
+                }
+                String url = sb.toString();
                 for(Session session : candidateSessions) {
                     // find a session with the specified tag
                     if(session.getTag().equalsIgnoreCase(tag)) {
-                        session.matching(uid);
+                        session.match(uid, url);
                         repository.save(session);
                         return ResponseEntity.ok(session);
                     }
                 }
                 // cannot find desired session, choose the session with the nearest startTime
                 Session session = candidateSessions.get(0);
-                session.matching(uid);
+                session.match(uid, url);
                 repository.save(session);
                 return ResponseEntity.ok(session);
             }

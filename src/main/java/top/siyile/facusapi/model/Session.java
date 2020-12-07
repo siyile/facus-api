@@ -24,19 +24,11 @@ import java.util.Random;
     public Long endTime;
 
     public int duration; // in minutes
-    private static final String CANDIDATE_CHARS = "abcdefghijklmnopqrstuvwxyz0123456789";
+
 
     public Session() {}
 
     public Session(String uid, String tag) {
-        StringBuilder sb = new StringBuilder();
-        Random random = new Random();
-        for (int i = 0; i < 12; i++) {
-            sb.append(CANDIDATE_CHARS.charAt(random.nextInt(CANDIDATE_CHARS
-                    .length())));
-        }
-        this.url = sb.toString();
-
         this.firstAttendant = uid;
         if (tag != null && !tag.isBlank()) {
             this.tag = tag;
@@ -48,8 +40,9 @@ import java.util.Random;
         this.endTime = startTime + 60 * duration;
     }
 
-    public void matching(String uid) {
+    public void match(String uid, String url) {
         this.secondAttendant = uid;
+        this.url = url;
         this.matchedTime = Instant.now().getEpochSecond();
         this.status = "matched";
     }
@@ -76,13 +69,6 @@ import java.util.Random;
     }
 
     public void initFromForm(SessionForm sessionForm) {
-        StringBuilder sb = new StringBuilder();
-        Random random = new Random();
-        for (int i = 0; i < 12; i++) {
-            sb.append(CANDIDATE_CHARS.charAt(random.nextInt(CANDIDATE_CHARS
-                    .length())));
-        }
-        this.url = sb.toString();
         this.firstAttendant = sessionForm.getFirstAttendant();
         if (!sessionForm.getTag().isBlank()) {
             this.tag = sessionForm.getTag();
