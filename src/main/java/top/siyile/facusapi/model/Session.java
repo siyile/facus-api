@@ -44,6 +44,8 @@ import java.util.Random;
         this.secondAttendant = uid;
         this.url = url;
         this.matchedTime = Instant.now().getEpochSecond();
+        this.setStartTime(this.matchedTime);
+        this.setEndTime(this.startTime + this.duration * 60);
         this.status = "matched";
     }
 

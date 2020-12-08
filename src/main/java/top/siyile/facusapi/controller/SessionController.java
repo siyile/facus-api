@@ -17,6 +17,7 @@ public class SessionController {
 
     private static final List<String> ALL_STATUS = Arrays.asList("created", "matched", "started", "expired", "cancelled");
     private static final String CANDIDATE_CHARS = "abcdefghijklmnopqrstuvwxyz0123456789";
+    private static final String URL_PREFIX = "https://facus.us/";
 
     @Autowired
     private SessionRepository repository;
@@ -273,7 +274,7 @@ public class SessionController {
             sb.append(CANDIDATE_CHARS.charAt(random.nextInt(CANDIDATE_CHARS
                     .length())));
         }
-        String url = sb.toString();
+        String url = URL_PREFIX + sb.toString();
         return url;
     }
 
