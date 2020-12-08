@@ -187,7 +187,7 @@ public class SessionController {
     }
 
     @PostMapping("/session/match")
-    public ResponseEntity<?> match(@RequestParam(required = false) String tag,
+    public ResponseEntity<?> match(@RequestBody MatchForm tag,
                                            HttpSession httpSession) {
         User loggedUser = getUserFromSession(httpSession);
         if(loggedUser == null) {
@@ -197,7 +197,7 @@ public class SessionController {
             List<Session> candidateSessions = repository.findByStatusOrderByStartTime("created");
             if(candidateSessions.isEmpty()) {
                 // cannot find unmatched sessions, generate a new session with random URL.
-                Session newSession = new Session(uid, tag);
+                Session newSession = new Session(uid, tag.getTag());
                 repository.save(newSession);
                 return ResponseEntity.ok(newSession);
             } else {
@@ -206,7 +206,7 @@ public class SessionController {
                 if (tag != null) {
                     for (Session session : candidateSessions) {
                         // find a session with the specified tag
-                        if (session.getTag().equalsIgnoreCase(tag)) {
+                        if (session.getTag().equalsIgnoreCase(tag.getTag())) {
                             session.match(uid, url);
                             repository.save(session);
                             return ResponseEntity.ok(session);
@@ -223,12 +223,12 @@ public class SessionController {
     }
 
     @PostMapping("/session/matchWithUid")
-    public ResponseEntity<?> matchWithUid(@RequestParam(required = false) String tag,
+    public ResponseEntity<?> matchWithUid(@RequestBody MatchForm tag,
                                     @RequestParam String uid) {
         List<Session> candidateSessions = repository.findByStatusOrderByStartTime("created");
         if(candidateSessions.isEmpty()) {
             // cannot find unmatched sessions, generate a new session with random URL.
-            Session newSession = new Session(uid, tag);
+            Session newSession = new Session(uid, tag.getTag());
             repository.save(newSession);
             return ResponseEntity.ok(newSession);
         } else {
@@ -237,7 +237,7 @@ public class SessionController {
             if(tag != null) {
                 for(Session session : candidateSessions) {
                     // find a session with the specified tag
-                    if(session.getTag().equalsIgnoreCase(tag)) {
+                    if(session.getTag().equalsIgnoreCase(tag.getTag())) {
                         session.match(uid, url);
                         repository.save(session);
                         return ResponseEntity.ok(session);
