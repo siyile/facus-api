@@ -68,8 +68,8 @@ import java.util.Random;
         this.endTime = startTime + 60 * duration;
     }
 
-    public void initFromForm(SessionForm sessionForm) {
-        this.firstAttendant = sessionForm.getFirstAttendant();
+    public void initFromForm(SessionForm sessionForm, String firstAttendant) {
+        this.firstAttendant = firstAttendant;
         if (!sessionForm.getTag().isBlank()) {
             this.tag = sessionForm.getTag();
         }

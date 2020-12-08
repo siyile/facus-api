@@ -8,6 +8,7 @@ import top.siyile.facusapi.repository.SessionRepository;
 import top.siyile.facusapi.repository.UserRepository;
 
 import javax.servlet.http.HttpSession;
+import java.time.Instant;
 import java.util.*;
 
 
@@ -39,18 +40,25 @@ public class SessionController {
     }
 
     @PostMapping("/session")
-    public ResponseEntity<?> updateSession(@RequestBody SessionForm sessionForm) {
+    public ResponseEntity<?> updateSession(@RequestBody SessionForm sessionForm, HttpSession httpSession) {
+        User loggedUser = getUserFromSession(httpSession);
+        String uid;
+        if(loggedUser == null) {
+            return ResponseEntity.badRequest().body("Not logged in yet");
+        } else {
+            uid = loggedUser.id;
+        }
         String operation = sessionForm.getOperation();
         if(operation == null) {
             return ResponseEntity.badRequest().body("wrong operation");
         }
         if(operation.equalsIgnoreCase("created")) {
             // create session with a random generated RL.
-            if (validateSession(sessionForm) > 0) {
+            if (validateSession(sessionForm, uid) > 0) {
                 return ResponseEntity.badRequest().body("time conflict");
             } else {
                 Session newSession = new Session();
-                newSession.initFromForm(sessionForm);
+                newSession.initFromForm(sessionForm, uid);
                 repository.save(newSession);
                 return ResponseEntity.ok(newSession);
             }
@@ -61,7 +69,7 @@ public class SessionController {
             if (session.isEmpty()) {
                 return ResponseEntity.badRequest().body("session does not exist");
             }
-            if (operation.equalsIgnoreCase("update") && (validateSession(sessionForm)) > 0) {
+            if (operation.equalsIgnoreCase("update") && (validateSession(sessionForm, uid)) > 0) {
                 return ResponseEntity.badRequest().body("time conflict");
             }
             session.get().updateFromForm(sessionForm);
@@ -69,6 +77,26 @@ public class SessionController {
             return ResponseEntity.ok(session.get());
         } else {
             return ResponseEntity.badRequest().body("wrong operation");
+        }
+    }
+
+    @PostMapping("/session/join")
+    public ResponseEntity<?> joinSession(@RequestParam String sid, HttpSession httpSession) {
+        Optional<Session> session = repository.findById(sid);
+        if(session.isEmpty()) {
+            return ResponseEntity.badRequest().body("session not found");
+        }
+        User loggedUser = getUserFromSession(httpSession);
+        if(loggedUser == null) {
+            return ResponseEntity.badRequest().body("Not logged in yet");
+        } else {
+            session.get().setSecondAttendant(loggedUser.id);
+            session.get().setMatchedTime(Instant.now().getEpochSecond());
+            session.get().setStatus("matched");
+            String url = generateUrl();
+            session.get().setUrl(url);
+            repository.save(session.get());
+            return ResponseEntity.ok(session.get());
         }
     }
 
@@ -164,13 +192,7 @@ public class SessionController {
                 return ResponseEntity.ok(newSession);
             } else {
                 // generate a randomized url for the new session
-                StringBuilder sb = new StringBuilder();
-                Random random = new Random();
-                for (int i = 0; i < 12; i++) {
-                    sb.append(CANDIDATE_CHARS.charAt(random.nextInt(CANDIDATE_CHARS
-                            .length())));
-                }
-                String url = sb.toString();
+                String url = generateUrl();
                 if (tag != null) {
                     for (Session session : candidateSessions) {
                         // find a session with the specified tag
@@ -235,8 +257,20 @@ public class SessionController {
         }
     }
 
-    public int validateSession(SessionForm sessionForm) {
-        String attendant = sessionForm.getFirstAttendant();
+    public String generateUrl() {
+        StringBuilder sb = new StringBuilder();
+        Random random = new Random();
+        for (int i = 0; i < 12; i++) {
+            sb.append(CANDIDATE_CHARS.charAt(random.nextInt(CANDIDATE_CHARS
+                    .length())));
+        }
+        String url = sb.toString();
+        return url;
+    }
+
+
+    public int validateSession(SessionForm sessionForm, String uid) {
+        String attendant = uid;
         Long endTime = sessionForm.startTime + sessionForm.duration * 60;
         List<Session> mySessions = repository.findByFirstAttendantOrSecondAttendant(attendant, attendant);
         for(Session session : mySessions) {
