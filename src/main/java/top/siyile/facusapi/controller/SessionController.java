@@ -44,33 +44,31 @@ public class SessionController {
         if(operation == null) {
             return ResponseEntity.badRequest().body("wrong operation");
         }
-        switch (operation){
-            case "create":
-                // create session with a random generated RL.
-                if(validateSession(sessionForm) > 0) {
-                    return ResponseEntity.badRequest().body("time conflict");
-                } else {
-                    Session newSession = new Session();
-                    newSession.initFromForm(sessionForm);
-                    repository.save(newSession);
-                    return ResponseEntity.ok(newSession);
-                }
-            case "update":
-            case "cancel":
-                String sid = sessionForm.getSid();
-                Optional<Session> session = repository.findById(sid);
-                if(session.isEmpty()) {
-                    return ResponseEntity.badRequest().body("session does not exist");
-                }
-                if(validateSession(sessionForm) > 0) {
-                    return ResponseEntity.badRequest().body("time conflict");
-                } else {
-                    session.get().updateFromForm(sessionForm);
-                    repository.save(session.get());
-                    return ResponseEntity.ok(session.get());
-                }
-            default:
-                return ResponseEntity.badRequest().body("wrong operation");
+        if(operation.equalsIgnoreCase("created")) {
+            // create session with a random generated RL.
+            if (validateSession(sessionForm) > 0) {
+                return ResponseEntity.badRequest().body("time conflict");
+            } else {
+                Session newSession = new Session();
+                newSession.initFromForm(sessionForm);
+                repository.save(newSession);
+                return ResponseEntity.ok(newSession);
+            }
+        } else if (operation.equalsIgnoreCase("update") ||
+                operation.equalsIgnoreCase("cancel")) {
+            String sid = sessionForm.getSid();
+            Optional<Session> session = repository.findById(sid);
+            if (session.isEmpty()) {
+                return ResponseEntity.badRequest().body("session does not exist");
+            }
+            if (operation.equalsIgnoreCase("update") && (validateSession(sessionForm)) > 0) {
+                return ResponseEntity.badRequest().body("time conflict");
+            }
+            session.get().updateFromForm(sessionForm);
+            repository.save(session.get());
+            return ResponseEntity.ok(session.get());
+        } else {
+            return ResponseEntity.badRequest().body("wrong operation");
         }
     }
 
