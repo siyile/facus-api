@@ -124,6 +124,18 @@ public class SessionController {
         return ResponseEntity.ok(sessions);
     }
 
+    @GetMapping("/session/user")
+    public ResponseEntity<?> getSessionFilterWithCookie(HttpSession httpSession) {
+        User loggedUser = getUserFromSession(httpSession);
+        if(loggedUser == null) {
+            return ResponseEntity.badRequest().body("Not logged in yet");
+        } else {
+            String uid = loggedUser.id;
+            List<Session> sessions = repository.findByFirstAttendantOrSecondAttendant(uid, uid);
+            return ResponseEntity.ok(sessions);
+        }
+    }
+
     @GetMapping("/session/user/filterByStatus")
     public ResponseEntity<?> getSessionFilterByUidAndStatus(@RequestParam String uid, @RequestParam String[] status) {
         List<Session> sessions = new ArrayList<>();
