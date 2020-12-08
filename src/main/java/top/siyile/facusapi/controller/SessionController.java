@@ -54,7 +54,7 @@ public class SessionController {
                 repository.save(newSession);
                 return ResponseEntity.ok(newSession);
             }
-        } else if (operation.equalsIgnoreCase("update") ||
+        } else if(operation.equalsIgnoreCase("update") ||
                 operation.equalsIgnoreCase("cancel")) {
             String sid = sessionForm.getSid();
             Optional<Session> session = repository.findById(sid);
@@ -136,7 +136,7 @@ public class SessionController {
         return ResponseEntity.ok(sessions);
     }
 
-    @PostMapping("/session/matching")
+    @PostMapping("/session/match")
     public ResponseEntity<?> match(@RequestBody String tag,
                                            HttpSession httpSession) {
         User loggedUser = getUserFromSession(httpSession);
@@ -173,6 +173,40 @@ public class SessionController {
                 repository.save(session);
                 return ResponseEntity.ok(session);
             }
+        }
+    }
+
+    @PostMapping("/session/matchWithUid")
+    public ResponseEntity<?> matchWithUid(@RequestParam String tag,
+                                    @RequestParam String uid) {
+        List<Session> candidateSessions = repository.findByStatusOrderByStartTime("created");
+        if(candidateSessions.isEmpty()) {
+            // cannot find unmatched sessions, generate a new session with random URL.
+            Session newSession = new Session(uid, tag);
+            repository.save(newSession);
+            return ResponseEntity.ok(newSession);
+        } else {
+            // generate a randomized url for the new session
+            StringBuilder sb = new StringBuilder();
+            Random random = new Random();
+            for (int i = 0; i < 12; i++) {
+                sb.append(CANDIDATE_CHARS.charAt(random.nextInt(CANDIDATE_CHARS
+                        .length())));
+            }
+            String url = sb.toString();
+            for(Session session : candidateSessions) {
+                // find a session with the specified tag
+                if(session.getTag().equalsIgnoreCase(tag)) {
+                    session.match(uid, url);
+                    repository.save(session);
+                    return ResponseEntity.ok(session);
+                }
+            }
+            // cannot find desired session, choose the session with the nearest startTime
+            Session session = candidateSessions.get(0);
+            session.match(uid, url);
+            repository.save(session);
+            return ResponseEntity.ok(session);
         }
     }
 
