@@ -90,6 +90,9 @@ public class SessionController {
         if(loggedUser == null) {
             return ResponseEntity.badRequest().body("Not logged in yet");
         } else {
+            if(!session.get().getStatus().equalsIgnoreCase("created")) {
+                return ResponseEntity.badRequest().body("Cannot join this session");
+            }
             session.get().setSecondAttendant(loggedUser.id);
             session.get().setMatchedTime(Instant.now().getEpochSecond());
             session.get().setStatus("matched");
