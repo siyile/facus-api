@@ -137,7 +137,7 @@ public class SessionController {
     }
 
     @PostMapping("/session/match")
-    public ResponseEntity<?> match(@RequestBody String tag,
+    public ResponseEntity<?> match(@RequestParam(required = false) String tag,
                                            HttpSession httpSession) {
         User loggedUser = getUserFromSession(httpSession);
         if(loggedUser == null) {
@@ -159,12 +159,14 @@ public class SessionController {
                             .length())));
                 }
                 String url = sb.toString();
-                for(Session session : candidateSessions) {
-                    // find a session with the specified tag
-                    if(session.getTag().equalsIgnoreCase(tag)) {
-                        session.match(uid, url);
-                        repository.save(session);
-                        return ResponseEntity.ok(session);
+                if (tag != null) {
+                    for (Session session : candidateSessions) {
+                        // find a session with the specified tag
+                        if (session.getTag().equalsIgnoreCase(tag)) {
+                            session.match(uid, url);
+                            repository.save(session);
+                            return ResponseEntity.ok(session);
+                        }
                     }
                 }
                 // cannot find desired session, choose the session with the nearest startTime
