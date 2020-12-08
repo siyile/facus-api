@@ -52,7 +52,7 @@ public class SessionController {
         if(operation == null) {
             return ResponseEntity.badRequest().body("wrong operation");
         }
-        if(operation.equalsIgnoreCase("created")) {
+        if(operation.equalsIgnoreCase("create")) {
             // create session with a random generated RL.
             if (validateSession(sessionForm, uid) > 0) {
                 return ResponseEntity.badRequest().body("time conflict");
