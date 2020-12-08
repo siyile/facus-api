@@ -86,12 +86,12 @@ public class SessionController {
         return ResponseEntity.ok(sessions);
     }
 
-    @GetMapping("/session/filterByTag")
-    public ResponseEntity<?> getSessionFilterByTag(@RequestParam String tag) {
-        if(tag.isBlank()) {
-            return ResponseEntity.ok(new ArrayList<Session>());
+    @GetMapping("/session/filterByTags")
+    public ResponseEntity<?> getSessionFilterByTags(@RequestParam String[] tags) {
+        List<Session> sessions = new ArrayList<>();
+        for(String tag : tags) {
+            sessions.addAll(repository.findByTagIgnoreCase(tag));
         }
-        List<Session> sessions = repository.findByTagIgnoreCase(tag);
         return ResponseEntity.ok(sessions);
     }
 
@@ -188,7 +188,6 @@ public class SessionController {
     }
 
     public int validateSession(SessionForm sessionForm) {
-        /*
         String attendant = sessionForm.getFirstAttendant();
         Long endTime = sessionForm.startTime + sessionForm.duration * 60;
         List<Session> mySessions = repository.findByFirstAttendantOrSecondAttendant(attendant, attendant);
@@ -197,7 +196,7 @@ public class SessionController {
                     session.endTime > sessionForm.startTime) {
                 return 1;
             }
-        }*/
+        }
         return 0;
     }
 }
