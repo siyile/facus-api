@@ -9,7 +9,7 @@ import java.util.Random;
 
 @Data public class Session {
     @Id
-    public String id;
+    public String sid;
 
     public String url;
     public String tag;
@@ -85,10 +85,10 @@ import java.util.Random;
 
     @Override
     public String toString() {
-        return String.format("Session[id=%s, tag='%s', firstAttendant='%s', " +
+        return String.format("Session[sid=%s, tag='%s', firstAttendant='%s', " +
                         "secondAttendant='%s', status='%s', duration=%s, " +
                         "createdTime=%d, matchedTime=%d, startTime=%d, endTime=%d]",
-                id, tag, firstAttendant,
+                sid, tag, firstAttendant,
                 secondAttendant, status, duration,
                 createdTime, matchedTime, startTime, endTime);
     }

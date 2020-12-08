@@ -233,13 +233,7 @@ public class SessionController {
             return ResponseEntity.ok(newSession);
         } else {
             // generate a randomized url for the new session
-            StringBuilder sb = new StringBuilder();
-            Random random = new Random();
-            for (int i = 0; i < 12; i++) {
-                sb.append(CANDIDATE_CHARS.charAt(random.nextInt(CANDIDATE_CHARS
-                        .length())));
-            }
-            String url = sb.toString();
+            String url = generateUrl();
             if(tag != null) {
                 for(Session session : candidateSessions) {
                     // find a session with the specified tag
