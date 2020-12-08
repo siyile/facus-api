@@ -168,15 +168,21 @@ public class SessionController {
     }
 
     @GetMapping("/session/user/filterByStatus")
-    public ResponseEntity<?> getSessionFilterByUidAndStatus(@RequestParam String uid, @RequestParam String[] status) {
-        List<Session> sessions = new ArrayList<>();
-        for(String stat : status) {
-            if(!ALL_STATUS.contains(stat)) {
-                return ResponseEntity.badRequest().body("wrong status");
+    public ResponseEntity<?> getSessionFilterByUidAndStatus( @RequestParam String[] status, HttpSession httpSession) {
+        User loggedUser = getUserFromSession(httpSession);
+        if(loggedUser == null) {
+            return ResponseEntity.badRequest().body("Not logged in yet");
+        } else {
+            String uid = loggedUser.id;
+            List<Session> sessions = new ArrayList<>();
+            for (String stat : status) {
+                if (!ALL_STATUS.contains(stat)) {
+                    return ResponseEntity.badRequest().body("wrong status");
+                }
+                sessions.addAll(repository.findByFirstAttendantOrSecondAttendantAndStatus(uid, uid, stat));
             }
-            sessions.addAll(repository.findByFirstAttendantOrSecondAttendantAndStatus(uid, uid, stat));
+            return ResponseEntity.ok(sessions);
         }
-        return ResponseEntity.ok(sessions);
     }
 
     @PostMapping("/session/match")
