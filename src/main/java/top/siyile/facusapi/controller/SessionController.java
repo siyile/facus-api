@@ -188,6 +188,7 @@ public class SessionController {
     }
 
     public int validateSession(SessionForm sessionForm) {
+        /*
         String attendant = sessionForm.getFirstAttendant();
         Long endTime = sessionForm.startTime + sessionForm.duration * 60;
         List<Session> mySessions = repository.findByFirstAttendantOrSecondAttendant(attendant, attendant);
@@ -196,7 +197,7 @@ public class SessionController {
                     session.endTime > sessionForm.startTime) {
                 return 1;
             }
-        }
+        }*/
         return 0;
     }
 }
