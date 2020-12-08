@@ -177,7 +177,7 @@ public class SessionController {
     }
 
     @PostMapping("/session/matchWithUid")
-    public ResponseEntity<?> matchWithUid(@RequestParam String tag,
+    public ResponseEntity<?> matchWithUid(@RequestParam(required = false) String tag,
                                     @RequestParam String uid) {
         List<Session> candidateSessions = repository.findByStatusOrderByStartTime("created");
         if(candidateSessions.isEmpty()) {
@@ -194,12 +194,14 @@ public class SessionController {
                         .length())));
             }
             String url = sb.toString();
-            for(Session session : candidateSessions) {
-                // find a session with the specified tag
-                if(session.getTag().equalsIgnoreCase(tag)) {
-                    session.match(uid, url);
-                    repository.save(session);
-                    return ResponseEntity.ok(session);
+            if(tag != null) {
+                for(Session session : candidateSessions) {
+                    // find a session with the specified tag
+                    if(session.getTag().equalsIgnoreCase(tag)) {
+                        session.match(uid, url);
+                        repository.save(session);
+                        return ResponseEntity.ok(session);
+                    }
                 }
             }
             // cannot find desired session, choose the session with the nearest startTime
