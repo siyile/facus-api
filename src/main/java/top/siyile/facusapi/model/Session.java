@@ -5,7 +5,6 @@ import lombok.Data;
 import org.springframework.data.annotation.Id;
 
 import java.time.Instant;
-import java.util.Random;
 
 @Data public class Session {
     @Id
@@ -17,9 +16,6 @@ import java.util.Random;
 
     public String uid1;
     public String uid2;
-
-    public User user1 = null;
-    public User user2 = null;
 
     public Long createdTime;
     public Long matchedTime;
@@ -43,8 +39,8 @@ import java.util.Random;
         this.endTime = startTime + 60 * duration;
     }
 
-    public Session sessionWithUserInfo(User user1, User user2) {
-        Session sessionWithUserInfo = new Session();
+    public SessionWithUserInfo sessionWithUserInfo(User user1, User user2) {
+        SessionWithUserInfo sessionWithUserInfo = new SessionWithUserInfo();
         sessionWithUserInfo.sid = sid;
         sessionWithUserInfo.url = url;
         sessionWithUserInfo.tag = tag;

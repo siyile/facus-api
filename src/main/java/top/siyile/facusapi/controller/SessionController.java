@@ -273,15 +273,15 @@ public class SessionController {
         return url;
     }
 
-    public List<Session> getSessionsWithUserInfo(List<Session> sessions) {
-        List<Session> sessionsWithUserInfo = new ArrayList<>();
+    public List<SessionWithUserInfo> getSessionsWithUserInfo(List<Session> sessions) {
+        List<SessionWithUserInfo> sessionsWithUserInfo = new ArrayList<>();
         for(Session session : sessions) {
             sessionsWithUserInfo.add(getSessionWithUserInfo(session));
         }
         return sessionsWithUserInfo;
     }
 
-    public Session getSessionWithUserInfo(Session session) {
+    public SessionWithUserInfo getSessionWithUserInfo(Session session) {
         String uid1 = session.getUid1();
         User user1, user2;
         Optional<User> user1_ = userRepository.findById(uid1);
