@@ -5,11 +5,13 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 import top.siyile.facusapi.model.LoginForm;
+import top.siyile.facusapi.model.Session;
 import top.siyile.facusapi.model.User;
 import top.siyile.facusapi.model.UserForm;
 import top.siyile.facusapi.repository.UserRepository;
 
 import javax.servlet.http.HttpSession;
+import java.util.Optional;
 
 @RestController
 public class UserController {
@@ -62,6 +64,15 @@ public class UserController {
         session.removeAttribute("email");
         session.invalidate();
         return ResponseEntity.ok("Logout succeeds");
+    }
+
+    @GetMapping("/user/{id}")
+    public ResponseEntity<?> getUserById(@PathVariable("id") String id) {
+        Optional<User> user = repository.findById(id);
+        if(user.isEmpty()) {
+            return ResponseEntity.badRequest().body("user not found");
+        }
+        return ResponseEntity.ok(user.get());
     }
 
     @GetMapping("/user")
