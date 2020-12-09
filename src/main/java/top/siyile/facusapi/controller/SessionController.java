@@ -279,7 +279,7 @@ public class SessionController {
             String uid1 = session.getUid1();
             Optional<User> user1_ = userRepository.findById(uid1);
             User user1, user2;
-            if(user1_ != null) {
+            if(!user1_.isEmpty()) {
                 user1 = user1_.get().userWithoutPassword();
             } else {
                 user1 = null;
@@ -287,7 +287,7 @@ public class SessionController {
 
             String uid2 = session.getUid2();
             Optional<User> user2_ = userRepository.findById(uid2);
-            if(user2_ != null) {
+            if(!user2_.isEmpty()) {
                 user2 = user2_.get().userWithoutPassword();
             } else {
                 user2 = null;
@@ -301,7 +301,7 @@ public class SessionController {
         String uid1 = session.getUid1();
         Optional<User> user1_ = userRepository.findById(uid1);
         User user1, user2;
-        if(user1_ != null) {
+        if(!user1_.isEmpty()) {
             user1 = user1_.get().userWithoutPassword();
         } else {
             user1 = null;
@@ -309,7 +309,7 @@ public class SessionController {
 
         String uid2 = session.getUid2();
         Optional<User> user2_ = userRepository.findById(uid2);
-        if(user2_ != null) {
+        if(!user2_.isEmpty()) {
             user2 = user2_.get().userWithoutPassword();
         } else {
             user2 = null;
