@@ -72,7 +72,7 @@ public class UserController {
         if(user.isEmpty()) {
             return ResponseEntity.badRequest().body("user not found");
         }
-        return ResponseEntity.ok(user.get());
+        return ResponseEntity.ok(user.get().userWithoutPassword());
     }
 
     @GetMapping("/user")
