@@ -18,8 +18,8 @@ import java.util.Random;
     public String firstAttendant;
     public String secondAttendant;
 
-    public User user1;
-    public User user2;
+    public User user1 = null;
+    public User user2 = null;
 
     public Long createdTime;
     public Long matchedTime;

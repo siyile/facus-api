@@ -277,9 +277,21 @@ public class SessionController {
         List<Session> sessionsWithUserInfo = new ArrayList<>();
         for(Session session : sessions) {
             String uid1 = session.getFirstAttendant();
-            User user1 = userRepository.findById(uid1).get().userWithoutPassword();
+            Optional<User> user1_ = userRepository.findById(uid1);
+            User user1, user2;
+            if(user1_ != null) {
+                user1 = user1_.get().userWithoutPassword();
+            } else {
+                user1 = null;
+            }
+
             String uid2 = session.getFirstAttendant();
-            User user2 = userRepository.findById(uid2).get().userWithoutPassword();
+            Optional<User> user2_ = userRepository.findById(uid2);
+            if(user2_ != null) {
+                user2 = user1_.get().userWithoutPassword();
+            } else {
+                user2 = null;
+            }
             sessionsWithUserInfo.add(session.sessionWithUserInfo(user1, user2));
         }
         return sessionsWithUserInfo;
@@ -287,9 +299,22 @@ public class SessionController {
 
     public Session getSessionWithUserInfo(Session session) {
         String uid1 = session.getFirstAttendant();
-        User user1 = userRepository.findById(uid1).get().userWithoutPassword();
+        Optional<User> user1_ = userRepository.findById(uid1);
+        User user1, user2;
+        if(user1_ != null) {
+            user1 = user1_.get().userWithoutPassword();
+        } else {
+            user1 = null;
+        }
+
         String uid2 = session.getFirstAttendant();
-        User user2 = userRepository.findById(uid2).get().userWithoutPassword();
+        Optional<User> user2_ = userRepository.findById(uid2);
+        if(user2_ != null) {
+            user2 = user1_.get().userWithoutPassword();
+        } else {
+            user2 = null;
+        }
+
         return session.sessionWithUserInfo(user1, user2);
     }
 
