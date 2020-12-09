@@ -28,7 +28,7 @@ public class SessionController {
     @GetMapping("/session")
     public ResponseEntity<?> getSessions() {
         List<Session> allSessions = repository.findAll();
-        return ResponseEntity.ok(allSessions);
+        return ResponseEntity.ok(getSessionsWithUserInfo(allSessions));
     }
 
     @GetMapping("/session/{sid}")
@@ -37,7 +37,7 @@ public class SessionController {
         if(session.isEmpty()) {
             return ResponseEntity.badRequest().body("session not found");
         }
-        return ResponseEntity.ok(session.get());
+        return ResponseEntity.ok(getSessionWithUserInfo(session.get()));
     }
 
     @PostMapping("/session")
@@ -61,7 +61,7 @@ public class SessionController {
                 Session newSession = new Session();
                 newSession.initFromForm(sessionForm, uid);
                 repository.save(newSession);
-                return ResponseEntity.ok(newSession);
+                return ResponseEntity.ok(getSessionWithUserInfo(newSession));
             }
         } else if(operation.equalsIgnoreCase("update") ||
                 operation.equalsIgnoreCase("cancel")) {
@@ -75,7 +75,7 @@ public class SessionController {
             }
             session.get().updateFromForm(sessionForm);
             repository.save(session.get());
-            return ResponseEntity.ok(session.get());
+            return ResponseEntity.ok(getSessionWithUserInfo(session.get()));
         } else {
             return ResponseEntity.badRequest().body("wrong operation");
         }
@@ -100,7 +100,7 @@ public class SessionController {
             String url = generateUrl();
             session.get().setUrl(url);
             repository.save(session.get());
-            return ResponseEntity.ok(session.get());
+            return ResponseEntity.ok(getSessionWithUserInfo(session.get()));
         }
     }
 
@@ -113,7 +113,8 @@ public class SessionController {
             }
             sessions.addAll(repository.findByStatusOrderByStartTime(stat));
         }
-        return ResponseEntity.ok(sessions);
+
+        return ResponseEntity.ok(getSessionsWithUserInfo(sessions));
     }
 
     @GetMapping("/session/filterByTags")
@@ -122,7 +123,7 @@ public class SessionController {
         for(String tag : tags) {
             sessions.addAll(repository.findByTagIgnoreCase(tag));
         }
-        return ResponseEntity.ok(sessions);
+        return ResponseEntity.ok(getSessionsWithUserInfo(sessions));
     }
 
     @GetMapping("/session/filterByTime")
@@ -153,7 +154,7 @@ public class SessionController {
     @GetMapping("/session/user/{uid}")
     public ResponseEntity<?> getSessionFilterByUid(@PathVariable("uid") String uid) {
         List<Session> sessions = repository.findByFirstAttendantOrSecondAttendant(uid, uid);
-        return ResponseEntity.ok(sessions);
+        return ResponseEntity.ok(getSessionsWithUserInfo(sessions));
     }
 
     @GetMapping("/session/user")
@@ -164,7 +165,7 @@ public class SessionController {
         } else {
             String uid = loggedUser.id;
             List<Session> sessions = repository.findByFirstAttendantOrSecondAttendant(uid, uid);
-            return ResponseEntity.ok(sessions);
+            return ResponseEntity.ok(getSessionsWithUserInfo(sessions));
         }
     }
 
@@ -182,7 +183,7 @@ public class SessionController {
                 }
                 sessions.addAll(repository.findByFirstAttendantOrSecondAttendantAndStatus(uid, uid, stat));
             }
-            return ResponseEntity.ok(sessions);
+            return ResponseEntity.ok(getSessionsWithUserInfo(sessions));
         }
     }
 
@@ -209,7 +210,7 @@ public class SessionController {
                         if (session.getTag().equalsIgnoreCase(tag.getTag())) {
                             session.match(uid, url);
                             repository.save(session);
-                            return ResponseEntity.ok(session);
+                            return ResponseEntity.ok(getSessionWithUserInfo(session));
                         }
                     }
                 }
@@ -217,7 +218,7 @@ public class SessionController {
                 Session session = candidateSessions.get(0);
                 session.match(uid, url);
                 repository.save(session);
-                return ResponseEntity.ok(session);
+                return ResponseEntity.ok(getSessionWithUserInfo(session));
             }
         }
     }
@@ -272,6 +273,25 @@ public class SessionController {
         return url;
     }
 
+    public List<Session> getSessionsWithUserInfo(List<Session> sessions) {
+        List<Session> sessionsWithUserInfo = new ArrayList<>();
+        for(Session session : sessions) {
+            String uid1 = session.getFirstAttendant();
+            User user1 = userRepository.findById(uid1).get().userWithoutPassword();
+            String uid2 = session.getFirstAttendant();
+            User user2 = userRepository.findById(uid2).get().userWithoutPassword();
+            sessionsWithUserInfo.add(session.sessionWithUserInfo(user1, user2));
+        }
+        return sessionsWithUserInfo;
+    }
+
+    public Session getSessionWithUserInfo(Session session) {
+        String uid1 = session.getFirstAttendant();
+        User user1 = userRepository.findById(uid1).get().userWithoutPassword();
+        String uid2 = session.getFirstAttendant();
+        User user2 = userRepository.findById(uid2).get().userWithoutPassword();
+        return session.sessionWithUserInfo(user1, user2);
+    }
 
     public int validateSession(SessionForm sessionForm, String uid) {
         String attendant = uid;

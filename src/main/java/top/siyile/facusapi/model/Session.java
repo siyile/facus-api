@@ -18,6 +18,9 @@ import java.util.Random;
     public String firstAttendant;
     public String secondAttendant;
 
+    public User user1;
+    public User user2;
+
     public Long createdTime;
     public Long matchedTime;
     public Long startTime;
@@ -38,6 +41,22 @@ import java.util.Random;
         this.startTime = Instant.now().getEpochSecond();
         this.duration = 60; // duration = 60min by default
         this.endTime = startTime + 60 * duration;
+    }
+
+    public Session sessionWithUserInfo(User user1, User user2) {
+        Session sessionWithUserInfo = new Session();
+        sessionWithUserInfo.sid = sid;
+        sessionWithUserInfo.url = url;
+        sessionWithUserInfo.tag = tag;
+        sessionWithUserInfo.status = status;
+        sessionWithUserInfo.createdTime = createdTime;
+        sessionWithUserInfo.matchedTime = matchedTime;
+        sessionWithUserInfo.startTime = startTime;
+        sessionWithUserInfo.endTime = endTime;
+        sessionWithUserInfo.duration = duration;
+        sessionWithUserInfo.user1 = user1;
+        sessionWithUserInfo.user2 = user2;
+        return sessionWithUserInfo;
     }
 
     public void match(String uid, String url) {
