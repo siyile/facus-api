@@ -288,7 +288,7 @@ public class SessionController {
             String uid2 = session.getFirstAttendant();
             Optional<User> user2_ = userRepository.findById(uid2);
             if(user2_ != null) {
-                user2 = user1_.get().userWithoutPassword();
+                user2 = user2_.get().userWithoutPassword();
             } else {
                 user2 = null;
             }
