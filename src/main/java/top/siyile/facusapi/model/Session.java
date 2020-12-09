@@ -48,6 +48,8 @@ import java.util.Random;
         sessionWithUserInfo.sid = sid;
         sessionWithUserInfo.url = url;
         sessionWithUserInfo.tag = tag;
+        sessionWithUserInfo.firstAttendant = firstAttendant;
+        sessionWithUserInfo.secondAttendant = secondAttendant;
         sessionWithUserInfo.status = status;
         sessionWithUserInfo.createdTime = createdTime;
         sessionWithUserInfo.matchedTime = matchedTime;
