@@ -94,7 +94,7 @@ public class SessionController {
             if(!session.get().getStatus().equalsIgnoreCase("created")) {
                 return ResponseEntity.badRequest().body("Cannot join this session");
             }
-            session.get().setSecondAttendant(loggedUser.id);
+            session.get().setUid2(loggedUser.id);
             session.get().setMatchedTime(Instant.now().getEpochSecond());
             session.get().setStatus("matched");
             String url = generateUrl();
@@ -153,7 +153,7 @@ public class SessionController {
 
     @GetMapping("/session/user/{uid}")
     public ResponseEntity<?> getSessionFilterByUid(@PathVariable("uid") String uid) {
-        List<Session> sessions = repository.findByFirstAttendantOrSecondAttendant(uid, uid);
+        List<Session> sessions = repository.findByUid1OrUid2(uid, uid);
         return ResponseEntity.ok(getSessionsWithUserInfo(sessions));
     }
 
@@ -164,7 +164,7 @@ public class SessionController {
             return ResponseEntity.badRequest().body("Not logged in yet");
         } else {
             String uid = loggedUser.id;
-            List<Session> sessions = repository.findByFirstAttendantOrSecondAttendant(uid, uid);
+            List<Session> sessions = repository.findByUid1OrUid2(uid, uid);
             return ResponseEntity.ok(getSessionsWithUserInfo(sessions));
         }
     }
@@ -181,7 +181,7 @@ public class SessionController {
                 if (!ALL_STATUS.contains(stat)) {
                     return ResponseEntity.badRequest().body("wrong status");
                 }
-                sessions.addAll(repository.findByFirstAttendantOrSecondAttendantAndStatus(uid, uid, stat));
+                sessions.addAll(repository.findByUid1OrUid2AndStatus(uid, uid, stat));
             }
             return ResponseEntity.ok(getSessionsWithUserInfo(sessions));
         }
@@ -276,7 +276,7 @@ public class SessionController {
     public List<Session> getSessionsWithUserInfo(List<Session> sessions) {
         List<Session> sessionsWithUserInfo = new ArrayList<>();
         for(Session session : sessions) {
-            String uid1 = session.getFirstAttendant();
+            String uid1 = session.getUid1();
             Optional<User> user1_ = userRepository.findById(uid1);
             User user1, user2;
             if(user1_ != null) {
@@ -285,7 +285,7 @@ public class SessionController {
                 user1 = null;
             }
 
-            String uid2 = session.getFirstAttendant();
+            String uid2 = session.getUid2();
             Optional<User> user2_ = userRepository.findById(uid2);
             if(user2_ != null) {
                 user2 = user2_.get().userWithoutPassword();
@@ -298,7 +298,7 @@ public class SessionController {
     }
 
     public Session getSessionWithUserInfo(Session session) {
-        String uid1 = session.getFirstAttendant();
+        String uid1 = session.getUid1();
         Optional<User> user1_ = userRepository.findById(uid1);
         User user1, user2;
         if(user1_ != null) {
@@ -307,10 +307,10 @@ public class SessionController {
             user1 = null;
         }
 
-        String uid2 = session.getFirstAttendant();
+        String uid2 = session.getUid2();
         Optional<User> user2_ = userRepository.findById(uid2);
         if(user2_ != null) {
-            user2 = user1_.get().userWithoutPassword();
+            user2 = user2_.get().userWithoutPassword();
         } else {
             user2 = null;
         }
@@ -321,7 +321,7 @@ public class SessionController {
     public int validateSession(SessionForm sessionForm, String uid) {
         String attendant = uid;
         Long endTime = sessionForm.startTime + sessionForm.duration * 60;
-        List<Session> mySessions = repository.findByFirstAttendantOrSecondAttendant(attendant, attendant);
+        List<Session> mySessions = repository.findByUid1OrUid2(attendant, attendant);
         for(Session session : mySessions) {
             if(session.startTime < endTime &&
                     session.endTime > sessionForm.startTime) {

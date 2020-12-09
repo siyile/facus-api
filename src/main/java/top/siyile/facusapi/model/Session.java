@@ -15,8 +15,8 @@ import java.util.Random;
     public String tag;
     public String status;
 
-    public String firstAttendant;
-    public String secondAttendant;
+    public String uid1;
+    public String uid2;
 
     public User user1 = null;
     public User user2 = null;
@@ -32,7 +32,7 @@ import java.util.Random;
     public Session() {}
 
     public Session(String uid, String tag) {
-        this.firstAttendant = uid;
+        this.uid1 = uid;
         if (tag != null && !tag.isBlank()) {
             this.tag = tag;
         }
@@ -48,8 +48,8 @@ import java.util.Random;
         sessionWithUserInfo.sid = sid;
         sessionWithUserInfo.url = url;
         sessionWithUserInfo.tag = tag;
-        sessionWithUserInfo.firstAttendant = firstAttendant;
-        sessionWithUserInfo.secondAttendant = secondAttendant;
+        sessionWithUserInfo.uid1 = uid1;
+        sessionWithUserInfo.uid2 = uid2;
         sessionWithUserInfo.status = status;
         sessionWithUserInfo.createdTime = createdTime;
         sessionWithUserInfo.matchedTime = matchedTime;
@@ -62,7 +62,7 @@ import java.util.Random;
     }
 
     public void match(String uid, String url) {
-        this.secondAttendant = uid;
+        this.uid2 = uid;
         this.url = url;
         this.matchedTime = Instant.now().getEpochSecond();
         this.setStartTime(this.matchedTime);
@@ -91,8 +91,8 @@ import java.util.Random;
         this.endTime = startTime + 60 * duration;
     }
 
-    public void initFromForm(SessionForm sessionForm, String firstAttendant) {
-        this.firstAttendant = firstAttendant;
+    public void initFromForm(SessionForm sessionForm, String uid1) {
+        this.uid1 = uid1;
         if (!sessionForm.getTag().isBlank()) {
             this.tag = sessionForm.getTag();
         }
@@ -106,11 +106,11 @@ import java.util.Random;
 
     @Override
     public String toString() {
-        return String.format("Session[sid=%s, tag='%s', firstAttendant='%s', " +
-                        "secondAttendant='%s', status='%s', duration=%s, " +
+        return String.format("Session[sid=%s, tag='%s', uid1='%s', " +
+                        "uid2='%s', status='%s', duration=%s, " +
                         "createdTime=%d, matchedTime=%d, startTime=%d, endTime=%d]",
-                sid, tag, firstAttendant,
-                secondAttendant, status, duration,
+                sid, tag, uid1,
+                uid2, status, duration,
                 createdTime, matchedTime, startTime, endTime);
     }
 }
