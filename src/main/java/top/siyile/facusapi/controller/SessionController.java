@@ -163,6 +163,16 @@ public class SessionController {
         return ResponseEntity.ok(getSessionsWithUserInfo(sessions));
     }
 
+    @GetMapping("/session/myInfo")
+    public ResponseEntity<?> getMyInfo(HttpSession httpSession) {
+        User loggedUser = getUserFromSession(httpSession);
+        if(loggedUser == null) {
+            return ResponseEntity.badRequest().body("Not logged in yet");
+        } else {
+            return ResponseEntity.ok(loggedUser);
+        }
+    }
+
     @GetMapping("/session/user")
     public ResponseEntity<?> getSessionFilterWithCookie(HttpSession httpSession) {
         User loggedUser = getUserFromSession(httpSession);
