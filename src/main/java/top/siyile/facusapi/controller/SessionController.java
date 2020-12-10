@@ -31,6 +31,12 @@ public class SessionController {
         return ResponseEntity.ok(getSessionsWithUserInfo(allSessions));
     }
 
+    @PostMapping("/session/delete")
+    public ResponseEntity<?> deleteAllSessions() {
+        repository.deleteAll();
+        return ResponseEntity.ok("all sessions deleted");
+    }
+
     @GetMapping("/session/{sid}")
     public ResponseEntity<?> getSessionBySid(@PathVariable("sid") String sid) {
         Optional<Session> session = repository.findById(sid);
