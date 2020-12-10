@@ -282,23 +282,31 @@ public class SessionController {
     }
 
     public SessionWithUserInfo getSessionWithUserInfo(Session session) {
-        String uid1 = session.getUid1();
         User user1, user2;
-        Optional<User> user1_ = userRepository.findById(uid1);
-        if(!user1_.isEmpty()) {
-            user1 = user1_.get().userWithoutPassword();
-        } else {
-            user1 = null;
-        }
-
+        String uid1 = session.getUid1();
         String uid2 = session.getUid2();
-        Optional<User> user2_ = userRepository.findById(uid2);
-        if(!user2_.isEmpty()) {
-            user2 = user2_.get().userWithoutPassword();
+
+        if(uid1 == null) {
+            user1 = null;
         } else {
-            user2 = null;
+            Optional<User> user1_ = userRepository.findById(uid1);
+            if (!user1_.isEmpty()) {
+                user1 = user1_.get().userWithoutPassword();
+            } else {
+                user1 = null;
+            }
         }
 
+        if(uid2 == null) {
+            user2 = null;
+        } else {
+            Optional<User> user2_ = userRepository.findById(uid2);
+            if (!user2_.isEmpty()) {
+                user2 = user2_.get().userWithoutPassword();
+            } else {
+                user2 = null;
+            }
+        }
         return session.sessionWithUserInfo(user1, user2);
     }
 
