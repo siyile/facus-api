@@ -169,7 +169,7 @@ public class SessionController {
         if(loggedUser == null) {
             return ResponseEntity.badRequest().body("Not logged in yet");
         } else {
-            return ResponseEntity.ok(loggedUser);
+            return ResponseEntity.ok(loggedUser.userWithoutPassword());
         }
     }
 
