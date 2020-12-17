@@ -173,6 +173,21 @@ public class SessionController {
         }
     }
 
+    @GetMapping("/session/changeInfo")
+    public ResponseEntity<?> getMyInfo(@RequestParam String uid,
+                                       @RequestParam String firstname,
+                                       @RequestParam String lastname) {
+        Optional<User> user = userRepository.findById(uid);
+        if(user.isEmpty()) {
+            return ResponseEntity.badRequest().body("user not found");
+        } else {
+            user.get().setFirstName(firstname);
+            user.get().setLastName(lastname);
+            userRepository.save(user.get());
+        }
+        return ResponseEntity.ok(user.get().userWithoutPassword());
+    }
+
     @GetMapping("/session/user")
     public ResponseEntity<?> getSessionFilterWithCookie(HttpSession httpSession) {
         User loggedUser = getUserFromSession(httpSession);
