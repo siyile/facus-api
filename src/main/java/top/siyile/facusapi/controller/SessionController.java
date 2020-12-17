@@ -117,7 +117,7 @@ public class SessionController {
             if(!ALL_STATUS.contains(stat)) {
                 return ResponseEntity.badRequest().body("wrong status");
             }
-            sessions.addAll(repository.findByStatusOrderByStartTime(stat));
+            sessions.addAll(repository.findByStatus(stat));
         }
 
         return ResponseEntity.ok(getSessionsWithUserInfo(sessions));

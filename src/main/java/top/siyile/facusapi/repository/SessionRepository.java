@@ -14,7 +14,7 @@ public interface SessionRepository extends MongoRepository<Session, String>{
     List<Session> findByStartTimeGreaterThanEqual(long startTime);
     List<Session> findByEndTimeLessThanEqual(long endTime);
 
-    List<Session> findByStatusOrderByStartTime(String status);
+    List<Session> findByStatus(String status);
     List<Session> findByDurationBetween(int minDuration, int maxDuration);
     List<Session> findByUid1OrUid2(String uid1, String uid2);
     List<Session> findByUid1OrUid2AndStatus(String uid1,String uid2, String status);
