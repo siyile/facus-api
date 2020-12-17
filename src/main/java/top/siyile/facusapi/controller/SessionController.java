@@ -223,7 +223,7 @@ public class SessionController {
                 if (tag != null) {
                     for (Session session : candidateSessions) {
                         // find a session with the specified tag
-                        if (session.getTag().equalsIgnoreCase(tag.getTag())) {
+                        if (session.getTag() != null && session.getTag().equalsIgnoreCase(tag.getTag())) {
                             session.match(uid, url);
                             repository.save(session);
                             return ResponseEntity.ok(getSessionWithUserInfo(session));
