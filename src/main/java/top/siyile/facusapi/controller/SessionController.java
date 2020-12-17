@@ -211,8 +211,19 @@ public class SessionController {
             return ResponseEntity.badRequest().body("Not logged in yet");
         } else {
             String uid = loggedUser.id;
-            List<Session> candidateSessions = repository.findByStatusOrderByStartTime("created");
-            if(candidateSessions.isEmpty()) {
+            List<Session> candidateSessions = repository.findByStatus("created");
+            boolean found = false;
+            for(Session session : candidateSessions) {
+                if(session.getUid1() != null && session.getUid1().equals(uid)
+                        || session.getUid2() != null && session.getUid2().equals(uid)
+                        || Instant.now().getEpochSecond() - session.getCreatedTime() > 60) {
+                    continue;
+                } else {
+                    found = true;
+                    break;
+                }
+            }
+            if(!found) {
                 // cannot find unmatched sessions, generate a new session with random URL.
                 Session newSession = new Session(uid, tag.getTag());
                 repository.save(newSession);
@@ -242,7 +253,7 @@ public class SessionController {
     @PostMapping("/session/matchWithUid")
     public ResponseEntity<?> matchWithUid(@RequestBody MatchForm tag,
                                     @RequestParam String uid) {
-        List<Session> candidateSessions = repository.findByStatusOrderByStartTime("created");
+        List<Session> candidateSessions = repository.findByStatus("created");
         if(candidateSessions.isEmpty()) {
             // cannot find unmatched sessions, generate a new session with random URL.
             Session newSession = new Session(uid, tag.getTag());
